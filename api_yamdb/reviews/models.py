@@ -23,8 +23,42 @@ class User(AbstractUser):
         return self.email
 
 
+class Category(models.Model):
+    name = models.CharField(max_length=256)
+    slug = models.SlugField(unique=True)
+
+
+class Genre(models.Model):
+    name = models.CharField(max_length=256)
+    slug = models.SlugField(unique=True)
+
+
 class Title(models.Model):
-    pass
+    name = models.CharField(max_length=256)
+    year = models.PositiveIntegerField(null=True)
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.SET_NULL,
+        related_name='titles',
+        null=True
+    )
+    genre = models.ManyToManyField(Genre)
+    description = models.TextField(
+        null=True,
+        blank=True
+    )
+
+
+class GenreTitle(models.Model):
+    title = models.ForeignKey(
+        Title,
+        on_delete=models.CASCADE)
+    genre = models.ForeignKey(
+        Genre,
+        on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.title}, жанр - {self.genre}'
 
 
 class Review(models.Model):
@@ -34,7 +68,7 @@ class Review(models.Model):
         Title, on_delete=models.CASCADE, related_name='reviews')
     text = models.TextField()
     score = models.IntegerField()
-    created = models.DateTimeField(
+    pub_date = models.DateTimeField(
         'Дата добавления', auto_now_add=True, db_index=True)
 
     def __str__(self):
@@ -55,7 +89,7 @@ class Comment(models.Model):
     review = models.ForeignKey(
         Review, on_delete=models.CASCADE, related_name='comments')
     text = models.TextField()
-    created = models.DateTimeField(
+    pub_date = models.DateTimeField(
         'Дата добавления', auto_now_add=True, db_index=True)
 
     def __str__(self):

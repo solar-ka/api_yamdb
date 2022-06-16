@@ -23,9 +23,27 @@ class User(AbstractUser):
         return self.email
 
 
-class Title(models.Model):
-    pass
+class Category(models.Model):
+    name = models.CharField(max_length=256)
+    slug = models.SlugField(unique=True)
 
+
+class Genre(models.Model):
+    name = models.CharField(max_length=256)
+    slug = models.SlugField(unique=True)
+
+
+class Title(models.Model):
+    name = models.CharField(max_length=256)
+    year = models.PositiveIntegerField(max_length=4)
+    category = models.ForeignKey(
+        Category, on_delete=models.SET_NULL, Null=True, related_name='titles')
+    genre = models.ManyToManyField(
+        Genre, related_name='titles')
+    description = models.TextField()
+
+    def __str__(self):
+        return self.text
 
 class Review(models.Model):
     author = models.ForeignKey(

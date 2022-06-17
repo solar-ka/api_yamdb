@@ -5,7 +5,7 @@ from django.core.management.base import BaseCommand
 
 class Command(BaseCommand):
 
-    def handle(self, *args, **options):
+    def load_reviews(self):
         from reviews.models import Review
         with open(r'static\data\review.csv', encoding='utf-8') as f:
             reader = csv.reader(f)
@@ -17,3 +17,6 @@ class Command(BaseCommand):
                     score=row[4], pub_date=row[5]
                 )
                 review.save()
+
+    def handle(self, *args, **options):
+        self.load_reviews()

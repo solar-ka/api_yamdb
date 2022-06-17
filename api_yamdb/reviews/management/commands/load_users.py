@@ -5,7 +5,7 @@ from django.core.management.base import BaseCommand
 
 class Command(BaseCommand):
 
-    def handle(self, *args, **options):
+    def load_users(self):
         from reviews.models import User
         with open(r'static\data\users.csv', encoding='utf-8') as f:
             reader = csv.reader(f)
@@ -16,3 +16,6 @@ class Command(BaseCommand):
                     email=row[2], role=row[3], bio=row[4],
                     first_name=row[5], last_name=row[6])
                 user.save()
+
+    def handle(self, *args, **options):
+        self.load_users()

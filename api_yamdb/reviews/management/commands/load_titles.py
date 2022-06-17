@@ -5,7 +5,7 @@ from django.core.management.base import BaseCommand
 
 class Command(BaseCommand):
 
-    def handle(self, *args, **options):
+    def load_titles(self):
         from reviews.models import Title
         with open(r'static\data\titles.csv', encoding='utf-8') as f:
             reader = csv.reader(f)
@@ -16,3 +16,6 @@ class Command(BaseCommand):
                     year=row[2], category_id=row[3]
                 )
                 title.save()
+
+    def handle(self, *args, **options):
+        self.load_titles()

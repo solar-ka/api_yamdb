@@ -25,10 +25,49 @@ class CommentAdmin(admin.ModelAdmin):
     )
 
 
-admin.site.register(User)
-admin.site.register(Category)
-admin.site.register(Genre)
-admin.site.register(Title)
+class UserAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'password',
+        'username',
+        'first_name',
+        'last_name',
+        'email',
+        'role',
+        'bio'
+    )
+
+
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'name',
+        'slug',
+    )
+
+
+class GenreAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'name',
+        'slug',
+    )
+
+
+class TitleAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'name',
+        'year',
+        'category',
+        'description'
+    )
+
+
+admin.site.register(User, UserAdmin)
+admin.site.register(Category, CategoryAdmin)
+admin.site.register(Genre, GenreAdmin)
+admin.site.register(Title, TitleAdmin)
 admin.site.register(Review, ReviewAdmin)
 admin.site.register(Comment, CommentAdmin)
 admin.site.register(GenreTitle)

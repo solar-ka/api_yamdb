@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from django.views.generic import TemplateView
-from api.views import RegistrationAPIView, TokenSerializer
+from api.views import RegistrationAPIView, GetToken
 urlpatterns = [
     path('admin/', admin.site.urls),
     path(
@@ -26,5 +26,5 @@ urlpatterns = [
     ),
     path('api/', include('api.urls')),
     path('auth/signup/', RegistrationAPIView.as_view(), name='user_signup'),
-    path('auth/token/', TokenSerializer, name='token_get'),
+    path('auth/token/', GetToken.as_view(), name='token_get'),
 ]

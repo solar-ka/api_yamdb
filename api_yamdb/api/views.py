@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
+from django.core.mail import send_mail
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -47,11 +48,7 @@ class RegistrationAPIView(APIView):
     serializer_class = SignupSerializer
 
     def post(self, request):
-        user = request.data.get('user', {})
-
-        # Паттерн создания сериализатора, валидации и сохранения - довольно
-        # стандартный, и его можно часто увидеть в реальных проектах.
-        serializer = self.serializer_class(data=user)
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
@@ -59,5 +56,11 @@ class RegistrationAPIView(APIView):
 
 
 class GetToken(APIView):
-    queryset = User.objects.all()
     serializer_class = TokenSerializer
+    permission_classes = (AllowAny,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)

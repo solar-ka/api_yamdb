@@ -1,8 +1,8 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 
-from .serializers import CommentSerializer, ReviewSerializer
-from reviews.models import Review, Title
+from .serializers import CommentSerializer, ReviewSerializer, SignupSerializer, TokenSerializer
+from reviews.models import Review, Title, User
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -33,3 +33,13 @@ class CommentViewSet(viewsets.ModelViewSet):
         review_id = self.kwargs.get('review_id')
         review = get_object_or_404(Review, id=review_id)
         serializer.save(author=self.request.user, review=review)
+
+
+class UserSignupViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = SignupSerializer
+
+
+class GetToken(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = TokenSerializer

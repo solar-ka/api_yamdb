@@ -1,0 +1,9 @@
+POST http://127.0.0.1:8000/api/v1/auth/signup/
+Content-type: application/json;
+
+{
+  "email": "string@ya.ru",
+  "username": "string"
+}
+###
+GET http://127.0.0.1:8000/api/v1/titles/1/reviews/

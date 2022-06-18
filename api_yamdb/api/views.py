@@ -1,12 +1,12 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets
-
-from .serializers import CommentSerializer, ReviewSerializer, SignupSerializer, TokenSerializer
-from reviews.models import Review, Title, User
-from rest_framework.views import APIView
+from rest_framework import status, viewsets
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework.views import APIView
+from reviews.models import Review, Title, User
+
+from .serializers import (CommentSerializer, ReviewSerializer,
+                          SignupSerializer, TokenSerializer)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -41,17 +41,16 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 class RegistrationAPIView(APIView):
     """
-    Разрешить всем пользователям (аутентифицированным и нет) доступ к данному эндпоинту.
+    Разрешить всем пользователям доступ к данному эндпоинту.
     """
     permission_classes = (AllowAny,)
     serializer_class = SignupSerializer
 
     def post(self, request):
-        user = request.data.get('user', {})
 
         # Паттерн создания сериализатора, валидации и сохранения - довольно
         # стандартный, и его можно часто увидеть в реальных проектах.
-        serializer = self.serializer_class(data=user)
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
 

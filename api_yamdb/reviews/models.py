@@ -18,6 +18,10 @@ class User(AbstractUser):
         'Биография',
         blank=True,
     )
+    confirmation_code = models.TextField(
+        'Код подтверждения',
+        blank=True,
+    )
 
     def __str__(self):
         return self.username

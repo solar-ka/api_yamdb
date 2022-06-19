@@ -19,9 +19,10 @@ class User(AbstractUser):
         verbose_name='Биография',
         blank=True,
     )
+    confirmation_code = models.TextField('Код подтверждения', blank=True,)
 
     def __str__(self):
-        return self.email
+        return self.username
 
     class Meta:
         verbose_name = 'Пользователь',
@@ -115,7 +116,7 @@ class GenreTitle(models.Model):
     class Meta:
         verbose_name = 'Связь произведения и жанра',
         verbose_name_plural = 'Связи произведений и жанров'
-
+        
 
 class Review(models.Model):
     author = models.ForeignKey(

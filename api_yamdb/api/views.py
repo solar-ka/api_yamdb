@@ -2,8 +2,17 @@ from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from reviews.models import Review, Title
 
+from .serializers import CommentSerializer, ReviewSerializer, SignupSerializer, TokenSerializer
+from reviews.models import Review, Title, User
+from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from rest_framework import status
+from django.core.mail import send_mail
+
 from .permissions import IsAuthorAdminModeratorOrReadOnly, ReadOnly
 from .serializers import CommentSerializer, ReviewSerializer
+
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -46,3 +55,29 @@ class CommentViewSet(viewsets.ModelViewSet):
         review_id = self.kwargs.get('review_id')
         review = get_object_or_404(Review, id=review_id)
         serializer.save(author=self.request.user, review=review)
+
+
+class RegistrationAPIView(APIView):
+    """
+    Разрешить всем пользователям (аутентифицированным и нет) доступ к данному эндпоинту.
+    """
+    permission_classes = (AllowAny,)
+    serializer_class = SignupSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class GetToken(APIView):
+    serializer_class = TokenSerializer
+    permission_classes = (AllowAny,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)

@@ -3,7 +3,6 @@ from django.contrib.auth.base_user import BaseUserManager
 from reviews.models import Comment, Review, User
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.core.mail import send_mail
-from django.contrib.auth import authenticate
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -49,8 +48,8 @@ class SignupSerializer(serializers.ModelSerializer):
         password = BaseUserManager().make_random_password()
         user = User(email=validated_data['email'],
                     username=validated_data['username'],
-                    password=password,
                     confirmation_code=password)
+        user.set_password(password)
         user.save()
         send_mail('Код подтверждения YaMDb',
                   f'{password}',
@@ -69,11 +68,9 @@ class TokenSerializer(TokenObtainPairSerializer):
         super().__init__(*args, **kwargs)
         self.fields['password'].required = False
 
-    # class Meta:
-    #     model = User
-    #     fields = ['username', 'confirmation_code', ]
-
     def validate(self, attrs):
         confirmation_code = attrs.get('confirmation_code')
         attrs.update({'password': f'{confirmation_code}'})
-        return {'token': attrs.get('token')}
+        del attrs['confirmation_code']
+        valid_result = super().validate(attrs)
+        return valid_result

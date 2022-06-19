@@ -1,18 +1,14 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets
-from reviews.models import Review, Title
-
-from .serializers import CommentSerializer, ReviewSerializer, SignupSerializer, TokenSerializer
-from reviews.models import Review, Title, User
-from rest_framework.views import APIView
+from rest_framework import status, viewsets
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework import status
-from django.core.mail import send_mail
+from rest_framework.views import APIView
+from rest_framework_simplejwt.views import TokenObtainPairView
+from reviews.models import Review, Title
 
 from .permissions import IsAuthorAdminModeratorOrReadOnly, ReadOnly
-from .serializers import CommentSerializer, ReviewSerializer
-
+from .serializers import (CommentSerializer, ReviewSerializer,
+                          SignupSerializer, TokenSerializer)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -59,7 +55,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 class RegistrationAPIView(APIView):
     """
-    Разрешить всем пользователям (аутентифицированным и нет) доступ к данному эндпоинту.
+    Разрешить всем пользователям доступ к данному эндпоинту.
     """
     permission_classes = (AllowAny,)
     serializer_class = SignupSerializer
@@ -72,12 +68,16 @@ class RegistrationAPIView(APIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-class GetToken(APIView):
-    serializer_class = TokenSerializer
+class GetToken(TokenObtainPairView):
     permission_classes = (AllowAny,)
+    serializer_class = TokenSerializer
 
+
+"""
+так тоже работает, но логичнее сделать как сделано выше:
+class GetToken(APIView):    
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)
+"""

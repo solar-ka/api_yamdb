@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
+from reviews.models import Review, Title
 
 from .serializers import CommentSerializer, ReviewSerializer, SignupSerializer, TokenSerializer
 from reviews.models import Review, Title, User
@@ -9,9 +10,19 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.core.mail import send_mail
 
+from .permissions import IsAuthorAdminModeratorOrReadOnly, ReadOnly
+from .serializers import CommentSerializer, ReviewSerializer
+
+
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
+    permission_classes = IsAuthorAdminModeratorOrReadOnly
+
+    def get_permissions(self):
+        if self.action == 'retrieve':
+            return (ReadOnly(),)
+        return super().get_permissions()
 
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')
@@ -27,6 +38,12 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
+    permission_classes = IsAuthorAdminModeratorOrReadOnly
+
+    def get_permissions(self):
+        if self.action == 'retrieve':
+            return (ReadOnly(),)
+        return super().get_permissions()
 
     def get_queryset(self):
         review_id = self.kwargs.get('review_id')

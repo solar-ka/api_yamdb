@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
+#from django.db.models import Avg
 
 from .serializers import (CommentSerializer, ReviewSerializer, TitleSerializer,
                           CategorySerializer, GenreSerializer)
@@ -42,7 +43,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     serializer_class = TitleSerializer
 
     #def perform_create(self, serializer):
-        #rating = Review.objects.filter()
+        #rating = Review.objects.aggregate(Avg('score'))
 
 
 

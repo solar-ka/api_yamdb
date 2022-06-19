@@ -1,16 +1,20 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
-#from django.db.models import Avg
 
 from .serializers import (CommentSerializer, ReviewSerializer, TitleSerializer,
-                          CategorySerializer, GenreSerializer)
+                          CategorySerializer, GenreSerializer, SignupSerializer, TokenSerializer)
 
-from reviews.models import Review, Title, Category, Genre
+from reviews.models import Review, Title, Category, Genre,  User
 
 
 from .permissions import (IsAuthorAdminModeratorOrReadOnly, ReadOnly,
 IsAdminOrReadOnly)
 
+from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from rest_framework import status
+from django.core.mail import send_mail
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -89,3 +93,29 @@ class GenreViewSet(viewsets.ModelViewSet):
         if self.action == 'list':
             return (ReadOnly(),)
         return super().get_permissions()
+
+      
+class RegistrationAPIView(APIView):
+    """
+    Разрешить всем пользователям (аутентифицированным и нет) доступ к данному эндпоинту.
+    """
+    permission_classes = (AllowAny,)
+    serializer_class = SignupSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class GetToken(APIView):
+    serializer_class = TokenSerializer
+    permission_classes = (AllowAny,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)

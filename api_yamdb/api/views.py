@@ -1,18 +1,20 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
-from reviews.models import Review, Title
 
-from .serializers import CommentSerializer, ReviewSerializer, SignupSerializer, TokenSerializer
-from reviews.models import Review, Title, User
+from .serializers import (CommentSerializer, ReviewSerializer, TitleSerializer,
+                          CategorySerializer, GenreSerializer, SignupSerializer, TokenSerializer)
+
+from reviews.models import Review, Title, Category, Genre,  User
+
+
+from .permissions import (IsAuthorAdminModeratorOrReadOnly, ReadOnly,
+IsAdminOrReadOnly)
+
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 from django.core.mail import send_mail
-
-from .permissions import IsAuthorAdminModeratorOrReadOnly, ReadOnly
-from .serializers import CommentSerializer, ReviewSerializer
-
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -57,6 +59,42 @@ class CommentViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user, review=review)
 
 
+class TitleViewSet(viewsets.ModelViewSet):
+    queryset = Title.objects.all()
+    serializer_class = TitleSerializer
+    permission_classes =(IsAdminOrReadOnly,)
+
+    def get_permissions(self):
+        if self.action == 'retrieve' or self.action == 'list':
+            return (ReadOnly(),)
+        return super().get_permissions()
+
+    #def perform_create(self, serializer):
+        #rating = Review.objects.aggregate(Avg('score'))
+
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes =(IsAdminOrReadOnly,)
+
+    def get_permissions(self):
+        if self.action  == 'list':
+            return (ReadOnly(),)
+        return super().get_permissions()
+
+
+class GenreViewSet(viewsets.ModelViewSet):
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    permission_classes =(IsAdminOrReadOnly,)
+
+    def get_permissions(self):
+        if self.action == 'list':
+            return (ReadOnly(),)
+        return super().get_permissions()
+
+      
 class RegistrationAPIView(APIView):
     """
     Разрешить всем пользователям (аутентифицированным и нет) доступ к данному эндпоинту.

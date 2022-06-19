@@ -1,10 +1,12 @@
 from rest_framework import serializers
+
 from django.contrib.auth.base_user import BaseUserManager
-from reviews.models import Comment, Review, User
+from reviews.models import Comment, Review, User, Title, Category, Genre
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.core.mail import send_mail
 from django.contrib.auth import authenticate
 
+import datetime as dt
 
 class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
@@ -32,6 +34,33 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('id', 'text', 'author', 'pub_date')
         model = Comment
+
+
+class TitleSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        fields = '__all__'
+        model = Title
+
+    def validate_year(self, value):
+        year = dt.date.today().year
+        if self.year > year:
+            raise serializers.ValidationError('Произведение не могло выйти')
+        return value
+
+
+class CategorySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        fields = '__all__'
+        model = Category
+
+
+class GenreSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        fields = '__all__'
+        model = Genre
 
 
 class SignupSerializer(serializers.ModelSerializer):

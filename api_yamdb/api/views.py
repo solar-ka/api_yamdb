@@ -8,8 +8,19 @@ from .serializers import (CommentSerializer, ReviewSerializer, TitleSerializer,
 from reviews.models import Review, Title, Category, Genre
 
 
+from .permissions import (IsAuthorAdminModeratorOrReadOnly, ReadOnly,
+IsAdminOrReadOnly)
+
+
+
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
+    permission_classes = IsAuthorAdminModeratorOrReadOnly
+
+    def get_permissions(self):
+        if self.action == 'retrieve':
+            return (ReadOnly(),)
+        return super().get_permissions()
 
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')
@@ -25,6 +36,12 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
+    permission_classes = IsAuthorAdminModeratorOrReadOnly
+
+    def get_permissions(self):
+        if self.action == 'retrieve':
+            return (ReadOnly(),)
+        return super().get_permissions()
 
     def get_queryset(self):
         review_id = self.kwargs.get('review_id')
@@ -41,17 +58,34 @@ class CommentViewSet(viewsets.ModelViewSet):
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
+    permission_classes =(IsAdminOrReadOnly,)
+
+    def get_permissions(self):
+        if self.action == 'retrieve' or self.action == 'list':
+            return (ReadOnly(),)
+        return super().get_permissions()
 
     #def perform_create(self, serializer):
         #rating = Review.objects.aggregate(Avg('score'))
 
 
-
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    permission_classes =(IsAdminOrReadOnly,)
+
+    def get_permissions(self):
+        if self.action  == 'list':
+            return (ReadOnly(),)
+        return super().get_permissions()
 
 
 class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
+    permission_classes =(IsAdminOrReadOnly,)
+
+    def get_permissions(self):
+        if self.action == 'list':
+            return (ReadOnly(),)
+        return super().get_permissions()

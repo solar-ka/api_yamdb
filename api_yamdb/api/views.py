@@ -1,14 +1,18 @@
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
-from reviews.models import Review, Title
+from reviews.models import Category, Genre, Review, Title, User
 
-from .permissions import IsAuthorAdminModeratorOrReadOnly, ReadOnly
-from .serializers import (CommentSerializer, ReviewSerializer,
-                          SignupSerializer, TokenSerializer)
+from .permissions import (IsAdmin, IsAdminOrReadOnly,
+                          IsAuthorAdminModeratorOrReadOnly, ReadOnly)
+from .serializers import (CategorySerializer, CommentSerializer,
+                          CreateTitleSerializer, GenreSerializer,
+                          ReviewSerializer, SignupSerializer, TitleSerializer,
+                          TokenSerializer, UserSerializer)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -53,6 +57,49 @@ class CommentViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user, review=review)
 
 
+class TitleViewSet(viewsets.ModelViewSet):
+    queryset = Title.objects.all().annotate(
+        Avg("reviews__score")
+    )
+    serializer_class = TitleSerializer
+    permission_classes = (IsAdminOrReadOnly,)
+
+    def get_permissions(self):
+        if self.action == 'retrieve' or self.action == 'list':
+            return (ReadOnly(),)
+        return super().get_permissions()
+
+    def get_serializer_class(self):
+        if self.action in ("retrieve", "list"):
+            return TitleSerializer
+        return CreateTitleSerializer
+
+    # def perform_create(self, serializer):
+        # rating = Review.objects.aggregate(Avg('score'))
+
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = (IsAdminOrReadOnly,)
+
+    def get_permissions(self):
+        if self.action == 'list':
+            return (ReadOnly(),)
+        return super().get_permissions()
+
+
+class GenreViewSet(viewsets.ModelViewSet):
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    permission_classes = (IsAdminOrReadOnly,)
+
+    def get_permissions(self):
+        if self.action == 'list':
+            return (ReadOnly(),)
+        return super().get_permissions()
+
+
 class RegistrationAPIView(APIView):
     """
     Разрешить всем пользователям доступ к данному эндпоинту.
@@ -84,3 +131,9 @@ class GetToken(APIView):
         )
         return Response(serializer.validated_data, status=status.HTTP_200_OK)
 """
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    permission_classes = (IsAdmin,)
+    serializer_class = UserSerializer

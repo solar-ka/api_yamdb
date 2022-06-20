@@ -27,8 +27,9 @@ class User(AbstractUser):
         return self.username
 
     class Meta:
-        verbose_name = 'Пользователь',
+        verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
+        ordering = ['username']
 
 
 class Category(models.Model):
@@ -42,8 +43,9 @@ class Category(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Категория',
+        verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
+        ordering = ['name']
 
 
 class Genre(models.Model):
@@ -57,8 +59,9 @@ class Genre(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Жанр',
+        verbose_name = 'Жанр'
         verbose_name_plural = 'Жанры'
+        ordering = ['name']
 
 
 class Title(models.Model):
@@ -79,14 +82,15 @@ class Title(models.Model):
     )
     genre = models.ManyToManyField(
         Genre,
-        verbose_name='Жанр произведения'
+        verbose_name='Жанр произведения',
+        through='GenreTitle'
     )
     description = models.TextField(
         null=True,
         blank=True,
         verbose_name='Описание произведения'
     )
-    rating = models.FloatField(
+    rating = models.IntegerField(
         null=True,
         default=None,
         verbose_name='Рейтинг произведения'
@@ -96,8 +100,9 @@ class Title(models.Model):
         return self.name
 
     class Meta:
-        verbose_name = 'Произведение',
+        verbose_name = 'Произведение'
         verbose_name_plural = 'Произведения'
+        ordering = ['name']
 
 
 class GenreTitle(models.Model):
@@ -159,8 +164,9 @@ class Review(models.Model):
                 name='unique_review'
             )
         ]
-        verbose_name = 'Отзыв',
+        verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
+        ordering = ['pub_date']
 
 
 class Comment(models.Model):
@@ -189,5 +195,6 @@ class Comment(models.Model):
         return self.text
 
     class Meta:
-        verbose_name = 'Комментарий',
+        verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
+        ordering = ['pub_date']

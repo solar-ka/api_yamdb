@@ -1,25 +1,23 @@
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets
 
-from .serializers import (CommentSerializer, ReviewSerializer, TitleSerializer,
-                          CategorySerializer, GenreSerializer, SignupSerializer, TokenSerializer)
-
-from reviews.models import Review, Title, Category, Genre,  User
-
-
-from .permissions import (IsAuthorAdminModeratorOrReadOnly, ReadOnly,
-IsAdminOrReadOnly)
-
-from rest_framework.views import APIView
+from rest_framework import status, viewsets
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework import status
-from django.core.mail import send_mail
+from rest_framework.views import APIView
+from rest_framework_simplejwt.views import TokenObtainPairView
+from reviews.models import Category, Genre, Review, Title, User
 
+from .permissions import (IsAdmin, IsAdminOrReadOnly,
+                          IsAuthorAdminModeratorOrReadOnly, ReadOnly)
+from .serializers import (CategorySerializer, CommentSerializer,
+                          CreateTitleSerializer, GenreSerializer,
+                          ReviewSerializer, SignupSerializer, TitleSerializer,
+                          TokenSerializer, UserSerializer)
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    permission_classes = IsAuthorAdminModeratorOrReadOnly
+    permission_classes = (IsAuthorAdminModeratorOrReadOnly,)
 
     def get_permissions(self):
         if self.action == 'retrieve':
@@ -40,7 +38,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = IsAuthorAdminModeratorOrReadOnly
+    permission_classes = (IsAuthorAdminModeratorOrReadOnly,)
 
     def get_permissions(self):
         if self.action == 'retrieve':
@@ -60,26 +58,32 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all()
+    queryset = Title.objects.all().annotate(
+        Avg("reviews__score")
+    )
     serializer_class = TitleSerializer
-    permission_classes =(IsAdminOrReadOnly,)
+    permission_classes = (IsAdminOrReadOnly,)
+
 
     def get_permissions(self):
         if self.action == 'retrieve' or self.action == 'list':
             return (ReadOnly(),)
         return super().get_permissions()
 
-    #def perform_create(self, serializer):
-        #rating = Review.objects.aggregate(Avg('score'))
+
+    def get_serializer_class(self):
+        if self.action in ("retrieve", "list"):
+            return TitleSerializer
+        return CreateTitleSerializer
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes =(IsAdminOrReadOnly,)
+    permission_classes = (IsAdminOrReadOnly,)
 
     def get_permissions(self):
-        if self.action  == 'list':
+        if self.action == 'list':
             return (ReadOnly(),)
         return super().get_permissions()
 
@@ -87,17 +91,18 @@ class CategoryViewSet(viewsets.ModelViewSet):
 class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    permission_classes =(IsAdminOrReadOnly,)
+    permission_classes = (IsAdminOrReadOnly,)
+
 
     def get_permissions(self):
         if self.action == 'list':
             return (ReadOnly(),)
         return super().get_permissions()
 
-      
+
 class RegistrationAPIView(APIView):
     """
-    Разрешить всем пользователям (аутентифицированным и нет) доступ к данному эндпоинту.
+    Разрешить всем пользователям доступ к данному эндпоинту.
     """
     permission_classes = (AllowAny,)
     serializer_class = SignupSerializer
@@ -107,15 +112,28 @@ class RegistrationAPIView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class GetToken(APIView):
-    serializer_class = TokenSerializer
+class GetToken(TokenObtainPairView):
     permission_classes = (AllowAny,)
+    serializer_class = TokenSerializer
 
+
+"""
+class GetToken(APIView):
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
+        get_object_or_404(
+            User,
+            username=serializer.validated_data["username"]
+        )
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)
+"""
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    permission_classes = (IsAdmin,)
+    serializer_class = UserSerializer

@@ -1,0 +1,111 @@
+POST http://127.0.0.1:8000/api/v1/auth/signup/
+Content-type: application/json;
+
+{
+  "email": "adm7@ya.ru",
+  "username": "adm"
+}
+###
+POST http://127.0.0.1:8000/api/v1/auth/token/
+Content-type: application/json;
+
+{
+  "username": "string4",
+  "confirmation_code": "jUNzZnJ35v"
+}
+###
+POST http://127.0.0.1:8000/api/v1/auth/token/
+Content-type: application/json;
+
+{
+  "username": "adm",
+  "confirmation_code": "KSyUqYceXd"
+}
+###
+GET http://127.0.0.1:8000/api/v1/titles/1/reviews/
+###
+POST http://127.0.0.1:8000/api/v1/titles/1/reviews/
+Content-type: application/json;
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjU2MzIxMjczLCJpYXQiOjE2NTU3MTY0NzMsImp0aSI6ImNmYjBlODQ1OTNjOTQ4ZTc4Mjc4NDQ0YzBjM2M3NmU5IiwidXNlcl9pZCI6NX0.OORDwcKLrkV5DKvQLIAkcjr7WihBzoL2qIqzhrcTonQ
+
+{
+    "text": "kek",
+    "score": 1
+}
+###
+POST http://127.0.0.1:8000/api/v1/titles/1/reviews/
+Content-type: application/json;
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjU2MzIxMjczLCJpYXQiOjE2NTU3MTY0NzMsImp0aSI6ImNmYjBlODQ1OTNjOTQ4ZTc4Mjc4NDQ0YzBjM2M3NmU5IiwidXNlcl9pZCI6NX0.OORDwcKLrkV5DKvQLIAkcjr7WihBzoL2qIqzhrcTonQ
+
+{
+    "text": "kek",
+    "score": 1
+}
+###
+POST http://127.0.0.1:8000/api/v1/titles/1/reviews/
+Content-type: application/json;
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjU2MzIzNzY2LCJpYXQiOjE2NTU3MTg5NjYsImp0aSI6IjlmM2U0MjdkMDczMTQ5OWI5M2M1MWViMzQ2YThmOTgzIiwidXNlcl9pZCI6MTA4fQ.0ZJwWJOEAI3XPIaJS3pPze8n32GAchSW0b1O-c63Nvo
+
+{
+    "text": "admin-kek",
+    "score": 10
+}
+###
+GET http://127.0.0.1:8000/api/v1/titles/1
+Content-type: application/json;
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjU2MzIzNzY2LCJpYXQiOjE2NTU3MTg5NjYsImp0aSI6IjlmM2U0MjdkMDczMTQ5OWI5M2M1MWViMzQ2YThmOTgzIiwidXNlcl9pZCI6MTA4fQ.0ZJwWJOEAI3XPIaJS3pPze8n32GAchSW0b1O-c63Nvo
+###
+POST http://127.0.0.1:8000/api/v1/titles/
+Content-type: application/json;
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjU2MzIzNzY2LCJpYXQiOjE2NTU3MTg5NjYsImp0aSI6IjlmM2U0MjdkMDczMTQ5OWI5M2M1MWViMzQ2YThmOTgzIiwidXNlcl9pZCI6MTA4fQ.0ZJwWJOEAI3XPIaJS3pPze8n32GAchSW0b1O-c63Nvo
+
+{
+  "name": "string",
+  "year": 0,
+  "description": "string",
+  "genre": [
+    "chanson"
+  ],
+  "category": "music"
+}
+###
+GET http://127.0.0.1:8000/api/v1/categories/1
+Content-type: application/json;
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjU2MzIzNzY2LCJpYXQiOjE2NTU3MTg5NjYsImp0aSI6IjlmM2U0MjdkMDczMTQ5OWI5M2M1MWViMzQ2YThmOTgzIiwidXNlcl9pZCI6MTA4fQ.0ZJwWJOEAI3XPIaJS3pPze8n32GAchSW0b1O-c63Nvo
+
+###
+GET http://127.0.0.1:8000/api/v1/titles/1/reviews/76
+Content-type: application/json;
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjU2MzIzNzY2LCJpYXQiOjE2NTU3MTg5NjYsImp0aSI6IjlmM2U0MjdkMDczMTQ5OWI5M2M1MWViMzQ2YThmOTgzIiwidXNlcl9pZCI6MTA4fQ.0ZJwWJOEAI3XPIaJS3pPze8n32GAchSW0b1O-c63Nvo
+
+
+###
+PATCH  http://127.0.0.1:8000/api/v1/titles/1/reviews/76/
+Content-type: application/json;
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjU2MzIzNzY2LCJpYXQiOjE2NTU3MTg5NjYsImp0aSI6IjlmM2U0MjdkMDczMTQ5OWI5M2M1MWViMzQ2YThmOTgzIiwidXNlcl9pZCI6MTA4fQ.0ZJwWJOEAI3XPIaJS3pPze8n32GAchSW0b1O-c63Nvo
+
+{
+    "text": "admin-redact-kek"
+}
+###
+GET http://127.0.0.1:8000/api/v1/users/
+Content-type: application/json;
+
+###
+GET http://127.0.0.1:8000/api/v1/users/
+Content-type: application/json;
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjU2MzIzNzY2LCJpYXQiOjE2NTU3MTg5NjYsImp0aSI6IjlmM2U0MjdkMDczMTQ5OWI5M2M1MWViMzQ2YThmOTgzIiwidXNlcl9pZCI6MTA4fQ.0ZJwWJOEAI3XPIaJS3pPze8n32GAchSW0b1O-c63Nvo
+
+###
+POST http://127.0.0.1:8000/api/v1/users/
+Content-type: application/json;
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjU2MzIzNzY2LCJpYXQiOjE2NTU3MTg5NjYsImp0aSI6IjlmM2U0MjdkMDczMTQ5OWI5M2M1MWViMzQ2YThmOTgzIiwidXNlcl9pZCI6MTA4fQ.0ZJwWJOEAI3XPIaJS3pPze8n32GAchSW0b1O-c63Nvo
+
+{
+    "username": "string",
+    "email": "user@example.com",
+    "first_name": "string",
+    "last_name": "string",
+    "bio": "string",
+    "role": "user"
+}

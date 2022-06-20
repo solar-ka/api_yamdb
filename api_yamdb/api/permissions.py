@@ -36,6 +36,7 @@ class IsAdminOrReadOnly(BasePermission):
         )
 
     def has_object_permission(self, request, view, obj):
+
         return request.user.role in ('admin')
 
 
@@ -49,3 +50,4 @@ class IsAdmin(BasePermission):
 
     def has_object_permission(self, request, view, obj):
         return request.user.role in ('admin')
+

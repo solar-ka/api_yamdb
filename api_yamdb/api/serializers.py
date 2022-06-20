@@ -1,6 +1,7 @@
 import datetime as dt
 
 from django.contrib.auth.base_user import BaseUserManager
+
 from django.core.mail import send_mail
 from django.forms import ValidationError
 from django.shortcuts import get_object_or_404
@@ -9,6 +10,7 @@ from rest_framework.validators import UniqueValidator
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from reviews.models import Category, Comment, Genre, Review, Title, User
 
+import datetime as dt
 
 class ReviewSerializer(serializers.ModelSerializer):
     title = serializers.SlugRelatedField(
@@ -82,6 +84,7 @@ class TitleSerializer(serializers.ModelSerializer):
         return value
 
 
+
 class CreateTitleSerializer(serializers.ModelSerializer):
     genre = serializers.SlugRelatedField(
         slug_field='slug', many=True, queryset=Genre.objects.all()
@@ -93,6 +96,7 @@ class CreateTitleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Title
         fields = '__all__'
+
 
 
 class SignupSerializer(serializers.ModelSerializer):

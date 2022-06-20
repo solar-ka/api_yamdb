@@ -14,7 +14,9 @@ class User(AbstractUser):
     role = models.SlugField(
         verbose_name='роль',
         max_length=16,
-        choices=CHOICES_ROLES)
+        choices=CHOICES_ROLES,
+        default='user'
+    )
     bio = models.TextField(
         verbose_name='Биография',
         blank=True,
@@ -116,7 +118,7 @@ class GenreTitle(models.Model):
     class Meta:
         verbose_name = 'Связь произведения и жанра',
         verbose_name_plural = 'Связи произведений и жанров'
-        
+
 
 class Review(models.Model):
     author = models.ForeignKey(

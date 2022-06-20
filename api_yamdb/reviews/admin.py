@@ -36,7 +36,6 @@ class UserAdmin(admin.ModelAdmin):
         'email',
         'role',
         'bio'
-        
     )
 
 

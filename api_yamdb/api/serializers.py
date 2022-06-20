@@ -1,8 +1,10 @@
-from rest_framework import serializers
 from django.contrib.auth.base_user import BaseUserManager
-from reviews.models import Comment, Review, User
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.core.mail import send_mail
+from django.shortcuts import get_object_or_404
+from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from reviews.models import Comment, Review, User
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -34,6 +36,23 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class SignupSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(
+        validators=[
+            UniqueValidator(
+                queryset=User.objects.all(),
+                message='Данное имя пользователя уже занято'
+            )
+        ]
+    )
+    email = serializers.EmailField(
+        validators=[
+            UniqueValidator(
+                queryset=User.objects.all(),
+                message='Данный email уже занят'
+            )
+        ]
+    )
+
     class Meta:
         model = User
         fields = ['username', 'email', ]
@@ -69,7 +88,10 @@ class TokenSerializer(TokenObtainPairSerializer):
         self.fields['password'].required = False
 
     def validate(self, attrs):
+        user = get_object_or_404(User, username=attrs['username'])
         confirmation_code = attrs.get('confirmation_code')
+        if confirmation_code != user.confirmation_code:
+            raise serializers.ValidationError('Неверный код подтверждения')
         attrs.update({'password': f'{confirmation_code}'})
         del attrs['confirmation_code']
         valid_result = super().validate(attrs)

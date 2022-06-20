@@ -13,7 +13,7 @@ from .serializers import (CommentSerializer, ReviewSerializer,
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    permission_classes = IsAuthorAdminModeratorOrReadOnly
+    permission_classes = (IsAuthorAdminModeratorOrReadOnly,)
 
     def get_permissions(self):
         if self.action == 'retrieve':
@@ -34,7 +34,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = IsAuthorAdminModeratorOrReadOnly
+    permission_classes = (IsAuthorAdminModeratorOrReadOnly,)
 
     def get_permissions(self):
         if self.action == 'retrieve':
@@ -65,7 +65,7 @@ class RegistrationAPIView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class GetToken(TokenObtainPairView):
@@ -74,10 +74,13 @@ class GetToken(TokenObtainPairView):
 
 
 """
-так тоже работает, но логичнее сделать как сделано выше:
-class GetToken(APIView):    
+class GetToken(APIView):
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
+        get_object_or_404(
+            User,
+            username=serializer.validated_data["username"]
+        )
         return Response(serializer.validated_data, status=status.HTTP_200_OK)
 """

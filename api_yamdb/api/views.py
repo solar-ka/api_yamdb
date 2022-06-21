@@ -141,6 +141,11 @@ class UserViewSet(viewsets.ModelViewSet):
     pagination_class = LimitOffsetPagination
     permission_classes = [IsAuthenticated, IsAdmin]
 
+    def get_permissions(self):
+        if self.request.user.is_superuser:
+            return (AllowAny(),)
+        return super().get_permissions()
+
     @action(detail=False,
             url_path='me',
             permission_classes=(IsAuthenticated,),
@@ -149,8 +154,7 @@ class UserViewSet(viewsets.ModelViewSet):
         user = get_object_or_404(User, username=request.user.username)
         print(user)
         if request.method == 'GET':
-            serializer = UserSerializer(user, data=request.data)
-            serializer.is_valid()
+            serializer = UserSerializer(user)
             print(serializer.data)
             return Response(serializer.data, status=status.HTTP_200_OK)
         serializer = UserSerializer(

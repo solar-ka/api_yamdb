@@ -7,6 +7,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 from reviews.models import Category, Genre, Review, Title, User
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters
 
 from .permissions import (IsAdmin, IsAdminOrReadOnly,
                           IsAuthorAdminModeratorOrReadOnly, ReadOnly)
@@ -62,7 +64,9 @@ class TitleViewSet(viewsets.ModelViewSet):
         Avg("reviews__score")
     )
     serializer_class = TitleSerializer
-    permission_classes = (IsAdminOrReadOnly,)
+    permission_classes = (IsAdmin,)
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter, )
+    search_fields = ('genre__slug',)
 
 
     def get_permissions(self):
@@ -80,7 +84,10 @@ class TitleViewSet(viewsets.ModelViewSet):
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = (IsAdminOrReadOnly,)
+    permission_classes = (IsAdmin,)
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter, )
+    search_fields = ('name',)
+
 
     def get_permissions(self):
         if self.action == 'list':
@@ -91,7 +98,9 @@ class CategoryViewSet(viewsets.ModelViewSet):
 class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    permission_classes = (IsAdminOrReadOnly,)
+    permission_classes = (IsAdmin,)
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter, )
+    search_fields = ('name',)
 
 
     def get_permissions(self):

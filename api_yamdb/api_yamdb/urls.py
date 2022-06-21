@@ -25,6 +25,4 @@ urlpatterns = [
         name='redoc'
     ),
     path('api/', include('api.urls')),
-    path('auth/signup/', RegistrationAPIView.as_view(), name='user_signup'),
-    path('auth/token/', GetToken.as_view(), name='token_get'),
 ]

@@ -12,6 +12,7 @@ from reviews.models import Category, Comment, Genre, Review, Title, User
 
 import datetime as dt
 
+
 class ReviewSerializer(serializers.ModelSerializer):
     title = serializers.SlugRelatedField(
         slug_field='name',
@@ -84,7 +85,6 @@ class TitleSerializer(serializers.ModelSerializer):
         return value
 
 
-
 class CreateTitleSerializer(serializers.ModelSerializer):
     genre = serializers.SlugRelatedField(
         slug_field='slug', many=True, queryset=Genre.objects.all()
@@ -96,7 +96,6 @@ class CreateTitleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Title
         fields = '__all__'
-
 
 
 class SignupSerializer(serializers.ModelSerializer):
@@ -181,9 +180,9 @@ class UserSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
+        model = User
         fields = (
             'username', 'email',
             'first_name', 'last_name',
             'bio', 'role'
         )
-        model = User

@@ -1,19 +1,21 @@
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 
-from rest_framework import status, viewsets
-from rest_framework.permissions import AllowAny
+from rest_framework import status, viewsets, filters
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 from reviews.models import Category, Genre, Review, Title, User
-
+from rest_framework.decorators import action
+from rest_framework.pagination import LimitOffsetPagination
 from .permissions import (IsAdmin, IsAdminOrReadOnly,
                           IsAuthorAdminModeratorOrReadOnly, ReadOnly)
 from .serializers import (CategorySerializer, CommentSerializer,
                           CreateTitleSerializer, GenreSerializer,
                           ReviewSerializer, SignupSerializer, TitleSerializer,
                           TokenSerializer, UserSerializer)
+
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
@@ -64,12 +66,10 @@ class TitleViewSet(viewsets.ModelViewSet):
     serializer_class = TitleSerializer
     permission_classes = (IsAdminOrReadOnly,)
 
-
     def get_permissions(self):
         if self.action == 'retrieve' or self.action == 'list':
             return (ReadOnly(),)
         return super().get_permissions()
-
 
     def get_serializer_class(self):
         if self.action in ("retrieve", "list"):
@@ -92,7 +92,6 @@ class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = (IsAdminOrReadOnly,)
-
 
     def get_permissions(self):
         if self.action == 'list':
@@ -135,5 +134,30 @@ class GetToken(APIView):
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
-    permission_classes = (IsAdmin,)
     serializer_class = UserSerializer
+    lookup_field = 'username'
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('username', 'first_name', 'last_name', 'role')
+    pagination_class = LimitOffsetPagination
+    permission_classes = [IsAuthenticated, IsAdmin]
+
+    @action(detail=False,
+            url_path='me',
+            permission_classes=(IsAuthenticated,),
+            methods=['GET', 'PATCH'])
+    def me(self, request):
+        user = get_object_or_404(User, username=request.user.username)
+        print(user)
+        if request.method == 'GET':
+            serializer = UserSerializer(user, data=request.data)
+            serializer.is_valid()
+            print(serializer.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        serializer = UserSerializer(
+            instance=user, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        if request.user.is_superuser or request.user.is_staff:
+            serializer.save()
+        else:
+            serializer.save(role=user.role)
+        return Response(serializer.data, status=status.HTTP_200_OK)

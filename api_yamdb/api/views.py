@@ -1,20 +1,23 @@
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 
-from rest_framework import status, viewsets, filters
+from rest_framework import filters, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
+
 from reviews.models import Category, Genre, Review, Title, User
-from rest_framework.decorators import action
-from rest_framework.pagination import LimitOffsetPagination
-from .permissions import (IsAdmin, IsAdminOrReadOnly,
-                          IsAuthorAdminModeratorOrReadOnly, ReadOnly)
-from .serializers import (CategorySerializer, CommentSerializer,
-                          CreateTitleSerializer, GenreSerializer,
-                          ReviewSerializer, SignupSerializer, TitleSerializer,
-                          TokenSerializer, UserSerializer)
+
+from api.permissions import (IsAdmin, IsAdminOrReadOnly,
+                             IsAuthorAdminModeratorOrReadOnly, ReadOnly)
+
+from api.serializers import (CategorySerializer, CommentSerializer,
+                             CreateTitleSerializer, GenreSerializer,
+                             ReviewSerializer, SignupSerializer, TitleSerializer,
+                             TokenSerializer, UserSerializer)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -100,9 +103,6 @@ class GenreViewSet(viewsets.ModelViewSet):
 
 
 class RegistrationAPIView(APIView):
-    """
-    Разрешить всем пользователям доступ к данному эндпоинту.
-    """
     permission_classes = (AllowAny,)
     serializer_class = SignupSerializer
 
@@ -117,19 +117,6 @@ class RegistrationAPIView(APIView):
 class GetToken(TokenObtainPairView):
     permission_classes = (AllowAny,)
     serializer_class = TokenSerializer
-
-
-"""
-class GetToken(APIView):
-    def post(self, request):
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        get_object_or_404(
-            User,
-            username=serializer.validated_data["username"]
-        )
-        return Response(serializer.validated_data, status=status.HTTP_200_OK)
-"""
 
 
 class UserViewSet(viewsets.ModelViewSet):

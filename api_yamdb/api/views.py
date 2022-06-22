@@ -20,6 +20,7 @@ from api.serializers import (CategorySerializer, CommentSerializer,
                              CreateTitleSerializer, GenreSerializer,
                              ReviewSerializer, SignupSerializer, TitleSerializer,
                              TokenSerializer, UserSerializer)
+from .filters import TitleFilter
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -70,8 +71,9 @@ class TitleViewSet(viewsets.ModelViewSet):
     )
     serializer_class = TitleSerializer
     permission_classes = (IsAdmin,)
-    filter_backends = (DjangoFilterBackend, filters.SearchFilter, )
-    search_fields = ('genre__slug',)
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    filterset_class = TitleFilter
+    search_fields = ('genre',)
 
     def get_permissions(self):
         if self.action == 'retrieve' or self.action == 'list':
@@ -91,11 +93,14 @@ class CategoryViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend, filters.SearchFilter, )
     search_fields = ('name',)
 
-
     def get_permissions(self):
         if self.action == 'list':
             return (ReadOnly(),)
         return super().get_permissions()
+
+    def perform_destroy(self, instance):
+
+        return super().perform_destroy(instance)
 
 
 class GenreViewSet(viewsets.ModelViewSet):

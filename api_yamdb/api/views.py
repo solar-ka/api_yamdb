@@ -1,3 +1,4 @@
+from urllib import response
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 
@@ -71,9 +72,9 @@ class TitleViewSet(viewsets.ModelViewSet):
     )
     serializer_class = TitleSerializer
     permission_classes = (IsAdmin,)
-    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
-    filterset_class = TitleFilter
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter, )
     search_fields = ('genre',)
+    filterset_class = TitleFilter
 
     def get_permissions(self):
         if self.action == 'retrieve' or self.action == 'list':
@@ -81,7 +82,7 @@ class TitleViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
     def get_serializer_class(self):
-        if self.action in ("retrieve", "list"):
+        if self.action in ("retrieve", "list", 'destroy'):
             return TitleSerializer
         return CreateTitleSerializer
 
@@ -102,18 +103,46 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
         return super().perform_destroy(instance)
 
+    def destroy(self, request, pk):
+        category = get_object_or_404(Category, slug=pk)
+        category.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def retrieve(self, request, pk):
+        if pk != '':
+            return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def partial_update(self, request, pk):
+        if pk != '':
+            return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
 
 class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    permission_classes = (IsAdmin,)
+    permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend, filters.SearchFilter, )
     search_fields = ('name',)
 
     def get_permissions(self):
         if self.action == 'list':
             return (ReadOnly(),)
+        if self.action == 'destroy':
+            return(IsAdmin(),)
         return super().get_permissions()
+
+    def destroy(self, request, pk):
+        genre = get_object_or_404(Genre, slug=pk)
+        genre.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def retrieve(self, request, pk):
+        if pk != '':
+            return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def partial_update(self, request, pk):
+        if pk != '':
+            return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 class RegistrationAPIView(APIView):

@@ -31,7 +31,7 @@ v1_router.register(
 v1_router.register(
     'users',
     UserViewSet,
-    basename='genres'
+    basename='users'
 )
 
 v1_router.register(

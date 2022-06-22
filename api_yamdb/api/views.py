@@ -117,11 +117,6 @@ class CategoryViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
-    def destroy(self, request, pk):
-        category = get_object_or_404(Category, slug=pk)
-        category.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
 class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer

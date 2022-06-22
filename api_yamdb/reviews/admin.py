@@ -27,9 +27,9 @@ class CommentAdmin(admin.ModelAdmin):
 
 class UserAdmin(admin.ModelAdmin):
     list_display = (
+        'username',
         'id',
         'password',
-        'username',
         'confirmation_code',
         'first_name',
         'last_name',

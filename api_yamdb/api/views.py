@@ -1,3 +1,4 @@
+from urllib import response
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 
@@ -71,7 +72,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     serializer_class = TitleSerializer
     permission_classes = (IsAdmin,)
     filter_backends = (DjangoFilterBackend, filters.SearchFilter, )
-    search_fields = ('genre__slug',)
+    search_fields = ('genre',)
 
     def get_permissions(self):
         if self.action == 'retrieve' or self.action == 'list':
@@ -101,13 +102,15 @@ class CategoryViewSet(viewsets.ModelViewSet):
 class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    permission_classes = (IsAdmin,)
+    permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend, filters.SearchFilter, )
     search_fields = ('name',)
 
     def get_permissions(self):
         if self.action == 'list':
             return (ReadOnly(),)
+        if self.action == 'destroy':
+            return(IsAdmin(),)
         return super().get_permissions()
 
 

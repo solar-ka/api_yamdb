@@ -126,8 +126,8 @@ class SignupSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         password = BaseUserManager().make_random_password()
         user = User(email=validated_data['email'],
-                    username=validated_data['username'],
-                    confirmation_code=password)
+                    username=validated_data['username']
+                    )
         user.set_password(password)
         user.save()
         send_mail('Код подтверждения YaMDb',
@@ -150,7 +150,7 @@ class TokenSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         user = get_object_or_404(User, username=attrs['username'])
         confirmation_code = attrs.get('confirmation_code')
-        if confirmation_code != user.confirmation_code:
+        if not user.check_password(confirmation_code):
             raise serializers.ValidationError('Неверный код подтверждения')
         attrs.update({'password': f'{confirmation_code}'})
         del attrs['confirmation_code']

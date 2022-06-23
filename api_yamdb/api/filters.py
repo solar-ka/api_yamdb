@@ -1,5 +1,6 @@
-from django_filters import rest_framework as filters, ModelChoiceFilter
-from reviews.models import Genre, Title, Category
+from django_filters import ModelChoiceFilter
+from django_filters import rest_framework as filters
+from reviews.models import Category, Genre, Title
 
 
 class TitleFilter(filters.FilterSet):

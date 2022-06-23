@@ -4,7 +4,6 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.core.mail import send_mail
 from django.forms import ValidationError
 from django.shortcuts import get_object_or_404
-
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -132,7 +131,7 @@ class SignupSerializer(serializers.ModelSerializer):
         user.set_password(password)
         user.save()
         send_mail('Код подтверждения YaMDb',
-                  f'{password}',
+                  f'Код подтверждения YaMDb: {password}',
                   'yamdb@yamdb.com',
                   [f'{validated_data["email"]}', ],
                   fail_silently=False,

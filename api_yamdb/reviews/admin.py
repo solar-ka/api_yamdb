@@ -30,7 +30,6 @@ class UserAdmin(admin.ModelAdmin):
         'username',
         'id',
         'password',
-        'confirmation_code',
         'first_name',
         'last_name',
         'email',

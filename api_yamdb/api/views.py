@@ -5,6 +5,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.contrib.auth.tokens import default_token_generator
 
 from rest_framework import filters, status, viewsets
+
 from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -87,61 +88,29 @@ class TitleViewSet(viewsets.ModelViewSet):
         return CreateTitleSerializer
 
 
-class CategoryViewSet(viewsets.ModelViewSet):
+class CreateListDeleteViewSet(
+    mixins.ListModelMixin, mixins.CreateModelMixin,
+    mixins.DestroyModelMixin, viewsets.GenericViewSet
+):
+    pass
+
+
+class CategoryViewSet(CreateListDeleteViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = (IsAdmin,)
-    filter_backends = (DjangoFilterBackend, filters.SearchFilter, )
+    permission_classes = (IsAdminOrReadOnly,)
+    filter_backends = (filters.SearchFilter, )
     search_fields = ('name',)
-
-    def get_permissions(self):
-        if self.action == 'list':
-            return (ReadOnly(),)
-        return super().get_permissions()
-
-    def perform_destroy(self, instance):
-        return super().perform_destroy(instance)
-
-    def destroy(self, request, pk):
-        category = get_object_or_404(Category, slug=pk)
-        category.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-    def retrieve(self, request, pk):
-        if pk != '':
-            return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-    def partial_update(self, request, pk):
-        if pk != '':
-            return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    lookup_field = 'slug'
 
 
-class GenreViewSet(viewsets.ModelViewSet):
+class GenreViewSet(CreateListDeleteViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = (IsAdminOrReadOnly,)
-    filter_backends = (DjangoFilterBackend, filters.SearchFilter, )
+    filter_backends = (filters.SearchFilter, )
     search_fields = ('name',)
-
-    def get_permissions(self):
-        if self.action == 'list':
-            return (ReadOnly(),)
-        if self.action == 'destroy':
-            return(IsAdmin(),)
-        return super().get_permissions()
-
-    def destroy(self, request, pk):
-        genre = get_object_or_404(Genre, slug=pk)
-        genre.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-    def retrieve(self, request, pk):
-        if pk != '':
-            return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-    def partial_update(self, request, pk):
-        if pk != '':
-            return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    lookup_field = 'slug'
 
 
 class RegistrationAPIView(APIView):

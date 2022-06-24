@@ -44,10 +44,11 @@ v1_router.register(
     CommentViewSet,
     basename='comments'
 )
-
+auth_urlpatterns = [
+    path('signup/', RegistrationAPIView.as_view(), name='user_signup'),
+    path('token/', GetToken.as_view(), name='token_get')
+]
 urlpatterns = [
-    path('v1/', include(v1_router.urls)),
-    path('v1/auth/signup/', RegistrationAPIView.as_view(), name='user_signup'),
-    path('v1/auth/token/', GetToken.as_view(), name='token_get'),
-
+    path('', include(v1_router.urls)),
+    path('auth/', include(auth_urlpatterns))
 ]

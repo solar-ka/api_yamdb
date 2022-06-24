@@ -1,7 +1,5 @@
 import datetime as dt
 
-from django.contrib.auth.base_user import BaseUserManager
-
 from django.forms import ValidationError
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers

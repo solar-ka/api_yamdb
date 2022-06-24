@@ -1,6 +1,9 @@
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
+from django.core.mail import send_mail
 from django_filters.rest_framework import DjangoFilterBackend
+from django.contrib.auth.tokens import default_token_generator
+
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
@@ -8,6 +11,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
+
 from reviews.models import Category, Genre, Review, Title, User
 
 from api.permissions import (IsAdmin, IsAdminOrReadOnly,
@@ -17,7 +21,7 @@ from api.serializers import (CategorySerializer, CommentSerializer,
                              ReviewSerializer, SignupSerializer,
                              TitleSerializer, TokenSerializer, UserSerializer)
 
-from .filters import TitleFilter
+from api.filters import TitleFilter
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -145,9 +149,19 @@ class RegistrationAPIView(APIView):
     serializer_class = SignupSerializer
 
     def post(self, request):
-        serializer = self.serializer_class(data=request.data)
+        serializer = SignupSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        user, created = User.objects.get_or_create(email=serializer.data['email'],
+                                                   username=serializer.data['username']
+                                                   )
+        confirmation_code = default_token_generator.make_token(user)
+        user.confirmation_code = confirmation_code
+        send_mail('Код подтверждения YaMDb',
+                  f'Код подтверждения YaMDb: {user.confirmation_code}',
+                  'yamdb@yamdb.com',
+                  [f'{serializer.data["email"]}', ],
+                  fail_silently=False,
+                  )
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -176,8 +190,10 @@ class UserViewSet(viewsets.ModelViewSet):
             methods=['GET', 'PATCH'])
     def me(self, request):
         user = get_object_or_404(User, username=request.user.username)
+        print(user)
         if request.method == 'GET':
             serializer = UserSerializer(user)
+            print(serializer.data)
             return Response(serializer.data, status=status.HTTP_200_OK)
         serializer = UserSerializer(
             instance=user, data=request.data, partial=True)

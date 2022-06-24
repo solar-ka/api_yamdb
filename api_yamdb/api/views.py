@@ -154,10 +154,11 @@ class RegistrationAPIView(APIView):
         user, created = User.objects.get_or_create(email=serializer.data['email'],
                                                    username=serializer.data['username']
                                                    )
-        confirmation_code = default_token_generator.make_token(user)
-        user.confirmation_code = confirmation_code
+        password = default_token_generator.make_token(user)
+        user.set_password(password)
+        user.save()
         send_mail('Код подтверждения YaMDb',
-                  f'Код подтверждения YaMDb: {user.confirmation_code}',
+                  f'Код подтверждения YaMDb: {password}',
                   'yamdb@yamdb.com',
                   [f'{serializer.data["email"]}', ],
                   fail_silently=False,
@@ -190,10 +191,8 @@ class UserViewSet(viewsets.ModelViewSet):
             methods=['GET', 'PATCH'])
     def me(self, request):
         user = get_object_or_404(User, username=request.user.username)
-        print(user)
         if request.method == 'GET':
             serializer = UserSerializer(user)
-            print(serializer.data)
             return Response(serializer.data, status=status.HTTP_200_OK)
         serializer = UserSerializer(
             instance=user, data=request.data, partial=True)

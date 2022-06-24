@@ -1,14 +1,14 @@
-from django_filters import rest_framework as filters, ModelChoiceFilter
+from django_filters import rest_framework as filters
 from reviews.models import Genre, Title, Category
 
 
 class TitleFilter(filters.FilterSet):
     name = filters.CharFilter(field_name='name', lookup_expr='icontains')
-    category = ModelChoiceFilter(
+    category = filters.ModelChoiceFilter(
         to_field_name='slug',
         queryset=Category.objects.all()
     )
-    genre = ModelChoiceFilter(
+    genre = filters.ModelChoiceFilter(
         to_field_name='slug',
         queryset=Genre.objects.all()
     )

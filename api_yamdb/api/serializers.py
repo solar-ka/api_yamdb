@@ -1,7 +1,7 @@
 import datetime as dt
 
 from django.contrib.auth.base_user import BaseUserManager
-from django.core.mail import send_mail
+
 from django.forms import ValidationError
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
@@ -123,25 +123,10 @@ class SignupSerializer(serializers.ModelSerializer):
                 'Нельзя использовать имя "me"')
         return username
 
-    def create(self, validated_data):
-        password = BaseUserManager().make_random_password()
-        user = User(email=validated_data['email'],
-                    username=validated_data['username']
-                    )
-        user.set_password(password)
-        user.save()
-        send_mail('Код подтверждения YaMDb',
-                  f'Код подтверждения YaMDb: {password}',
-                  'yamdb@yamdb.com',
-                  [f'{validated_data["email"]}', ],
-                  fail_silently=False,
-                  )
-        return user
-
 
 class TokenSerializer(TokenObtainPairSerializer):
     username = serializers.CharField(max_length=255)
-    confirmation_code = serializers.CharField(max_length=128)
+    confirmation_code = serializers.CharField(max_length=128, allow_blank=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

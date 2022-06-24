@@ -18,9 +18,15 @@ api_yamdb
 ## Как запустить проект:
 
 - Установите и активируйте виртуальное окружение
+-- Для Windows:
 ```
 python -m venv venv
-source venv/Scripts/activate
+source venv\Scripts\activate
+``` 
+-- Для Linux или Mac:
+```
+python3 -m venv venv
+source venv/bin/activate
 ``` 
 - Установите зависимости из файла requirements.txt
 ```

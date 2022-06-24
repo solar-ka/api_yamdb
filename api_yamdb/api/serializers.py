@@ -21,8 +21,8 @@ class ReviewSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        fields = ('id', 'text', 'author', 'score', 'pub_date', 'title')
         model = Review
+        fields = '__all__'
 
     def validate(self, data):
         title_id = self.context['view'].kwargs['title_id']
@@ -45,22 +45,22 @@ class CommentSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        fields = ('id', 'text', 'author', 'pub_date')
         model = Comment
+        exclude = ('review',)
 
 
 class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
-        fields = ('name', 'slug')
         model = Category
+        fields = ('name', 'slug')
 
 
 class GenreSerializer(serializers.ModelSerializer):
 
     class Meta:
-        fields = ('name', 'slug')
         model = Genre
+        fields = ('name', 'slug')
 
 
 class TitleSerializer(serializers.ModelSerializer):
@@ -72,8 +72,8 @@ class TitleSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        fields = '__all__'
         model = Title
+        fields = '__all__'
 
     def validate_year(self, value):
         year = dt.date.today().year
@@ -115,7 +115,7 @@ class SignupSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['username', 'email', ]
+        fields = ('username', 'email')
 
     def validate_username(self, username):
         if username.lower() == 'me':

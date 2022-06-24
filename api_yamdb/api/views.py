@@ -176,10 +176,8 @@ class UserViewSet(viewsets.ModelViewSet):
             methods=['GET', 'PATCH'])
     def me(self, request):
         user = get_object_or_404(User, username=request.user.username)
-        print(user)
         if request.method == 'GET':
             serializer = UserSerializer(user)
-            print(serializer.data)
             return Response(serializer.data, status=status.HTTP_200_OK)
         serializer = UserSerializer(
             instance=user, data=request.data, partial=True)
